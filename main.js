@@ -1,5 +1,11 @@
 const loggedOutLinks = document.querySelectorAll(".logged-out");
 const loggedInLinks = document.querySelectorAll(".logged-in");
+const mascotaForm = document.getElementById("mascotas-form");
+const mascotasContainer = document.getElementById("mascotas-container");
+
+let editStatus=false;
+let id='';
+
 
 const loginCheck = (user) => {
   if (user) {
@@ -57,43 +63,164 @@ signInForm.addEventListener("submit", (e) => {
 });
 
 // Posts
-const postList = document.querySelector(".posts");
-const setupPosts = (data) => {
-  if (data.length) {
-    let html = "";
-    data.forEach((doc) => {
+// const postList = document.querySelector(".mascotas");
+// const setupPosts = (data) => {
+//   if (data.length) {
+//     let html = "";
+//     data.forEach((doc) => {
+//       const post = doc.data();
+//       const li = `
+//       <li class="list-group-item list-group-item-action">
+//         <h5>Nombre de Mascota: ${post.nombre}</h5>
+//         <p>Dueño: ${post.dueño}</p>
+//         <p>Peso: ${post.peso}</p>
+//         <p>Edad: ${post.edad}</p>
+//       </li>
+//     `;
+//       html += li;
+//     });
+//     postList.innerHTML = html;
+//   } else {
+//     postList.innerHTML = '<h4 class="text-white">Login to See Posts</h4>';
+//   }
+// };
+
+
+/**
+ * Save a New Task in Firestore
+ * @param {string} nombre the title of the Task
+ * @param {string} edad the title of the Task
+ * @param {string} peso the title of the Task
+ * @param {string} dueño the description of the Task
+ */
+ const saveTask = (nombre, dueño,peso,edad) =>
+ fs.collection("mascotas").doc().set({
+   nombre,
+   dueño,
+   peso,
+   edad,
+ });
+
+ const getMascotas = () => fs.collection("mascotas").get();
+
+const onGetMascota = (callback) => fs.collection("mascotas").onSnapshot(callback);
+
+const deleteMascota = (id) => fs.collection("mascotas").doc(id).delete();
+
+const getMascota = (id) => fs.collection("mascotas").doc(id).get();
+
+const updateMascota = (id, updateMascota) => fs.collection('mascotas').doc(id).update(updateMascota);
+
+window.addEventListener("DOMContentLoaded", async (e) => {
+  onGetMascota((querySnapshot) => {
+    mascotasContainer.innerHTML = "";
+
+    querySnapshot.forEach((doc) => {
       const post = doc.data();
-      const li = `
-      <li class="list-group-item list-group-item-action">
-        <h5>${post.title}</h5>
-        <p>${post.content}</p>
-      </li>
-    `;
-      html += li;
+
+      mascotasContainer.innerHTML += `<div class="card card-body mt-2 border-primary">
+    
+    <h5>Nombre de Mascota: ${post.nombre}</h5>
+         <p>Dueño: ${post.dueño}</p>
+         <p>Peso: ${post.peso}</p>
+         <p>Edad: ${post.edad}</p>
+    <div>
+      <button class="btn btn-primary btn-delete" data-id="${doc.id}">
+        🗑 Delete
+      </button>
+      <button class="btn btn-secondary btn-edit" data-id="${doc.id}">
+        🖉 Edit
+      </button>
+    </div>
+  </div>`;
     });
-    postList.innerHTML = html;
-  } else {
-    postList.innerHTML = '<h4 class="text-white">Login to See Posts</h4>';
+
+    const btnsDelete = mascotasContainer.querySelectorAll(".btn-delete");
+    btnsDelete.forEach((btn) =>
+      btn.addEventListener("click", async (e) => {
+        console.log(e.target.dataset.id);
+        try {
+          await deleteMascota(e.target.dataset.id);
+        } catch (error) {
+          console.log(error);
+        }
+      })
+    );
+
+    const btnsEdit = mascotasContainer.querySelectorAll(".btn-edit");
+    btnsEdit.forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        try {
+          const doc = await getMascota(e.target.dataset.id);
+          const task = doc.data();
+          mascotaForm["task-nombre"].value = task.nombre;
+          mascotaForm["task-dueño"].value = task.dueño;
+          mascotaForm["task-peso"].value = task.peso;
+          mascotaForm["task-edad"].value = task.edad;
+
+          editStatus = true;
+          id = doc.id;
+          mascotaForm["btn-task-form"].innerText = "Update";
+
+        } catch (error) {
+          console.log(error);
+        }
+      });
+    });
+  });
+});
+
+mascotaForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const nombre = mascotaForm["task-nombre"];
+  const dueño = mascotaForm["task-dueño"];
+  const peso = mascotaForm["task-peso"];
+  const edad = mascotaForm["task-edad"];
+
+  try {
+    if (!editStatus) {
+      await saveTask(nombre.value, dueño.value,peso.value,edad.value);
+    } else {
+      await updateMascota(id, {
+        nombre: nombre.value,
+        dueño: dueño.value,
+        peso: peso.value,
+        edad: edad.value,
+
+      })
+      editStatus = false;
+      id = '';
+      mascotaForm['btn-task-form'].innerText = 'Save';
+    }
+
+    mascotaForm.reset();
+    title.focus();
+  } catch (error) {
+    console.log(error);
   }
-};
+});
+
+
 
 // events
 // list for auth state changes
-auth.onAuthStateChanged((user) => {
-  if (user) {
-    console.log("signin");
-    fs.collection("posts")
-      .get()
-      .then((snapshot) => {
-        setupPosts(snapshot.docs);
-        loginCheck(user);
-      });
-  } else {
-    console.log("signout");
-    setupPosts([]);
-    loginCheck(user);
-  }
-});
+// auth.onAuthStateChanged((user) => {
+//   if (user) {
+//     console.log("signin");
+//     fs.collection("mascotas")
+//       .get()
+//       .then((snapshot) => {
+//         console.log(snapshot.docs)
+//         setupPosts(snapshot.docs);
+//         loginCheck(user);
+//       });
+//   } else {
+//     console.log("signout");
+//     setupPosts([]);
+//     loginCheck(user);
+//   }
+// });
 
 // Login with Google
 const googleButton = document.querySelector("#googleLogin");
@@ -110,8 +237,27 @@ googleButton.addEventListener("click", (e) => {
   })
   .catch(err => {
     console.log(err);
+    console.log("error aca");
   })
 });
+
+// Login with twtitter
+// const twitterButton = document.querySelector("#twitterLogin");
+
+// twitterButton.addEventListener("click", (e) => {
+//   e.preventDefault();
+//   signInForm.reset();
+//   $("#signinModal").modal("hide");
+
+//   const provider = new firebase.auth.TwitterAuthProvider();
+//   auth.signInWithPopup(provider).then((result) => {
+//     console.log(result);
+//     console.log("twitter sign in");
+//   })
+//   .catch(err => {
+//     console.log(err);
+//   })
+// });
 
 // Login with Facebook
 const facebookButton = document.querySelector('#facebookLogin');

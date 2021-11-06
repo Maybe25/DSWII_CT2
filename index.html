@@ -5,6 +5,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Firebase Auth Example</title>
+    <!-- BOOTSWATCH -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.0/pulse/bootstrap.min.css">
+
+    <!-- ANIMATE CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css" />
+
   <!-- BOOSTRAP CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
     integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
@@ -13,8 +19,9 @@
 <body class="bg-dark">
 
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
+    
     <div class="container">
-
+      
       <a class="navbar-brand" href="#">Navbar</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -23,10 +30,10 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item logged-out" style="display: none;">
-            <a class="nav-link" href="#" data-toggle="modal" data-target="#signinModal">Signin</a>
+            <a class="nav-link" href="#" data-toggle="modal" data-target="#signinModal">Ingresar</a>
           </li>
           <li class="nav-item logged-out" style="display: none;">
-            <a class="nav-link" href="#" data-toggle="modal" data-target="#signupModal">Signup</a>
+            <a class="nav-link" href="#" data-toggle="modal" data-target="#signupModal">Registrarse</a>
           </li>
           <li class="nav-item logged-in" style="display: none;">
             <a class="nav-link" href="#" id="logout">Logout</a>
@@ -36,14 +43,53 @@
     </div>
   </nav>
 
+  <!-- Main content-->
+
+   <!-- ADD TASK -->
+   <div class="container p-4">
+    <div class="row">
+      <div class="col-md-6 offset mx-auto" >
+        <div class="card">
+          <div class="card-body">
+
+            <h1 class="h4">Add Task</h1>
+
+            <form id="mascotas-form">
+              <div class="form-group">
+                <input type="text" id="task-nombre" class="form-control" class="Task nombre" placeholder="Nombre mascota"
+                  autofocus>
+              </div>
+              <div class="form-group">
+                <textarea id="task-dueño" rows="3" class="form-control" placeholder="Dueño"></textarea>
+              </div>
+              <div class="form-group">
+                <textarea id="task-peso" rows="3" class="form-control" placeholder="Peso"></textarea>
+              </div>
+              <div class="form-group">
+                <textarea id="task-edad" rows="3" class="form-control" placeholder="Edad"></textarea>
+              </div>
+
+              <button class="btn btn-primary" id="btn-task-form">
+                Save
+              </button>
+
+            </form>
+          </div>
+        </div>
+      </div>
+
   <div class="container p-4">
     <div class="row">
       <div class="col-md-6 offset-md-3">
-        <ul class="list-group posts">
+        <ul class="list-group mascotas">
+       
         </ul>
       </div>
     </div>
   </div>
+
+
+  <div class="col-md-6 mx-auto" id="mascotas-container"></div>
 
   <!-- Modal -->
   <div class="modal fade" id="signupModal" tabindex="-1" role="dialog"
@@ -92,6 +138,7 @@
             <button type="submit" class="btn btn-secondary btn-block">Login</button>
             <button type="button" class="btn btn-info btn-block" id="googleLogin">Login with Google</button>
             <button type="button" class="btn btn-primary btn-block" id="facebookLogin">Login with Facebook</button>
+            <button type="button" class="btn btn-warning btn-block" id="twitterLogin">Login with Twitter</button>
           </form>
         </div>
       </div>
@@ -110,13 +157,15 @@
 
   <!-- SDK FIREBASE -->
   <!-- The core Firebase JS SDK is always required and must be listed first -->
-  <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-app.js"></script>
+   <script src="https://www.gstatic.com/firebasejs/7.15.1/firebase-app.js"></script>
 
   <!-- TODO: Add SDKs for Firebase products that you want to use
      https://firebase.google.com/docs/web/setup#available-libraries -->
 
-  <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.15.1/firebase-auth.js"></script>
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+     <script src="https://www.gstatic.com/firebasejs/7.15.1/firebase-firestore.js"></script>
   <!-- Don't change the format for any other products. -->
   <!-- etc. -->
 
@@ -124,7 +173,12 @@
   <script>
     // Your web app's Firebase configuration
     var firebaseConfig = {
-      // YOUR FIREBASE CREDENTIALS HERE 
+      apiKey: "AIzaSyCGQozbeO0g0pwL9ezl82YpgFc5Wb5Yi0g",
+      authDomain: "proyectodswii.firebaseapp.com",
+      projectId: "proyectodswii",
+      storageBucket: "proyectodswii.appspot.com",
+      messagingSenderId: "911576760614",
+      appId: "1:911576760614:web:911aed3c52a1a3272fc1e7"
     };
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
